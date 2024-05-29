@@ -1,10 +1,10 @@
 package dev.opafritz.logistiker.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.opafritz.logistiker.dtos.AuthDto;
-import dev.opafritz.logistiker.dtos.LoginResponseDto;
 import dev.opafritz.logistiker.entities.User;
 import dev.opafritz.logistiker.services.AuthenticationService;
 import dev.opafritz.logistiker.services.JwtService;
@@ -31,9 +31,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthDto authDto) {
+    public ResponseEntity<String> login(@RequestBody AuthDto authDto, HttpServletResponse response) {
         User authenticatedUser = authenticationService.authenticate(authDto);
         String jwt = jwtService.buildToken(authenticatedUser);
+        response.addCookie(authenticationService.setAuthCookie(jwt));
 
         return ResponseEntity.ok(jwt);
 

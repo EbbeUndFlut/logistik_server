@@ -1,5 +1,8 @@
 package dev.opafritz.logistiker.services;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,5 +39,12 @@ public class AuthenticationService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authDto.getEmail(), authDto.getPassword()));
         return userRepository.findByEmail(authDto.getEmail()).orElseThrow();
+    }
+
+    public Cookie setAuthCookie(String token){
+        Cookie cookie = new Cookie("logistiker",token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        return cookie;
     }
 }

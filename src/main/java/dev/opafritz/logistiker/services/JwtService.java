@@ -17,6 +17,8 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.MacAlgorithm;
 import io.jsonwebtoken.security.Password;
 
+import javax.crypto.SecretKey;
+
 @Service
 public class JwtService {
 
@@ -39,7 +41,7 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails);
     }
 
-    public Key getKey(){
+    public SecretKey getKey(){
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -67,9 +69,10 @@ public class JwtService {
 
     // @TODO try und catch block
     public Claims parseToken(String token) {
+
         return Jwts
                 .parser()
-                .verifyWith(key)
+                .verifyWith(getKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
