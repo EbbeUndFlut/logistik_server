@@ -31,12 +31,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthDto authDto, HttpServletResponse response) {
+    public void login(@RequestBody AuthDto authDto, HttpServletResponse response) {
         User authenticatedUser = authenticationService.authenticate(authDto);
         String jwt = jwtService.buildToken(authenticatedUser);
         response.addCookie(authenticationService.setAuthCookie(jwt));
 
-        return ResponseEntity.ok(jwt);
+
 
     }
 }
