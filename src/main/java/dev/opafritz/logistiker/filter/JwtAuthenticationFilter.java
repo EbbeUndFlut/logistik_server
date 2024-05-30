@@ -1,7 +1,9 @@
 package dev.opafritz.logistiker.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,13 +45,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String ckToken = null;
+        Cookie[] cookies = request.getCookies();
+
+        for(Cookie ck:cookies){
+            if("logistiker".equals(ck.getName()))
+                ckToken = ck.getValue();
+        }
+
+        if (ckToken == null ) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            final String jwt = authHeader.substring(7);
+            final String jwt = ckToken;
             final String userEmail = jwtService.extractUsername(jwt);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
