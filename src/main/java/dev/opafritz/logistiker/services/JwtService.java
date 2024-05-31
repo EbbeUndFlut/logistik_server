@@ -28,13 +28,14 @@ public class JwtService {
     MacAlgorithm alg; // Können wir auch weglassen und es wird automatisch der beste Algorithmus
                       // verwendet
 
-    @Value("${security.jwt.expiration-time:10000}")
+
     private long jwtExpirationTime;
 
     public JwtService() {
         alg = Jwts.SIG.HS256;
         this.secretKey="f06b02777272e390e8043e8d7c329eecde074eb650c13c8368ede35a0a178f6b";
         key = Keys.password(secretKey.toCharArray());
+        jwtExpirationTime = 360000;
     }
 
     public String buildToken(UserDetails userDetails) {
@@ -53,7 +54,7 @@ public class JwtService {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 200000))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationTime))
                 .signWith(getKey())
                 .compact();
     }

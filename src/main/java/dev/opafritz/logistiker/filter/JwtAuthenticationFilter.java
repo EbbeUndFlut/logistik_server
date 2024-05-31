@@ -44,15 +44,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+
         String ckToken = null;
         Cookie[] cookies = request.getCookies();
 
-        for(Cookie ck:cookies){
-            if("logistiker".equals(ck.getName()))
-                ckToken = ck.getValue();
+        if(cookies != null) {
+            for (Cookie ck : cookies) {
+                if ("logistiker".equals(ck.getName()))
+                    ckToken = ck.getValue();
+            }
         }
-
+        System.out.println(ckToken);
         if (ckToken == null ) {
             filterChain.doFilter(request, response);
             return;
@@ -64,13 +66,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String userEmail = jwtService.extractUsername(jwt);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
             if (userEmail != null && authentication == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-                if(jwtService.isTokenExpired(jwt)) {
-                    System.out.println("ich bin hir");
+
+                if(!jwtService.isTokenExpired(jwt)) {
+
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userEmail, null,
                             userDetails.getAuthorities());
+
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
